@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2017", "DOM"],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "typeRoots": ["node_modules/@types"]
+  },
+  "include": ["src/**/*"]
+}

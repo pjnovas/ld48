@@ -1,0 +1,27 @@
+{
+  "name": "ld-48",
+  "version": "0.0.1",
+  "license": "BSD-3-CLAUSE",
+  "author": "Pablo Novas <pjnovas@gmail.com>",
+  "scripts": {
+    "build": "tsc --noEmit && parcel build index.html",
+    "dev": "parcel index.html --open",
+    "start": "npm run build && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.168",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "2.2.1",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "rxjs": "^6.6.7"
+  }
+}
