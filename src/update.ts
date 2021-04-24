@@ -1,3 +1,4 @@
+import first from "lodash/first";
 import { getPolyPoints, getPolySegments } from "./geometric.utils";
 import { rndInt } from "./math.utils";
 import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
@@ -19,6 +20,7 @@ const createPoly = (props: Partial<Polygon>): Polygon => ({
   word: {
     segment: rndInt(0, 8 - 1 /* sides */),
     text: words[2],
+    matchAt: 0,
   },
   ...props,
 });
@@ -57,7 +59,6 @@ const updatePoly = ({
   }));
 };
 
-// const velCenter = 50
 let curr = 0;
 
 const updTunnel = (
@@ -65,6 +66,7 @@ const updTunnel = (
   tunnel: Tunnel,
   { viewport }: GameState
 ): Tunnel => {
+  // const velCenter = 50
   const center: Point =
     //  tunnel.lastCenter
     // ? {
@@ -119,8 +121,24 @@ const update = (
   inputState: string,
   worldSize: Size
 ): GameState => {
-  if (inputState) console.log(inputState);
   state.viewport = worldSize;
+
+  if (inputState.length === 1) {
+    const poly = state.tunnel.polygons.find(({ word }) => !word.done);
+    if (!poly) return;
+    const word = poly.word;
+
+    if (inputState === word.text.charAt(word.matchAt)) {
+      if (word.matchAt === word.text.length - 1) {
+        word.done = true;
+        console.log("done!");
+        // TODO: sum up word.score
+      } else word.matchAt++;
+    } else {
+      console.log("MISS!");
+    }
+  }
+
   return { ...state, tunnel: updTunnel(deltaTime, state.tunnel, state) };
 };
 

@@ -1,3 +1,4 @@
+import { words } from "lodash";
 import { Color, GameState, Point, Segment, Word } from "./types";
 
 const drawCircle = (
@@ -93,12 +94,14 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
   ctx.save();
 
   state.tunnel.polytube.forEach(({ segments, color }) =>
-    // drawPath(ctx, points, color)
     drawSegments(ctx, segments, color)
   );
 
-  state.tunnel.polygons.forEach(({ segments, word, color }) =>
-    drawSegments(ctx, segments, color, word)
-  );
+  state.tunnel.polygons
+    .filter(({ word }) => !word.done)
+    .forEach(({ segments, word, color }) =>
+      drawSegments(ctx, segments, color, word)
+    );
+
   ctx.restore();
 };
