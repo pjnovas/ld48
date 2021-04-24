@@ -25,9 +25,9 @@ interface Word {
   segment: number;
   size?: number;
   points?: number;
-  matchAt: number;
-  done: boolean;
-  score: number;
+  matchAt?: number;
+  done?: boolean;
+  score?: number;
 }
 
 interface Polygon {
@@ -50,6 +50,9 @@ interface Tunnel {
   runSpeed: number;
   polygons: Array<Polygon>;
   polytube: Array<Polygon>;
+
+  // timed
+  lastCenter?: Point;
 }
 
 export interface GameState {
