@@ -19,7 +19,7 @@ const createPoly = (props: Partial<Polygon>): Polygon => ({
   rotation: 0,
   word: {
     segment: rndInt(0, 8 - 1 /* sides */),
-    text: words[2],
+    text: words[rndInt(0, words.length - 1)],
     matchAt: 0,
   },
   ...props,

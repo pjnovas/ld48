@@ -74,17 +74,34 @@ const drawSegments = (
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const text = word.text.toUpperCase();
-  const m = ctx.measureText(text);
+  type Letter = [letter: string, width: number, offset: number];
 
-  const h = word.size * 1.1;
-  const w = m.width * 1.1;
+  const letters = Array.from(word.text.toUpperCase()).reduce<
+    [Array<Letter>, number]
+  >(
+    ([letters, total], letter) => {
+      const w = ctx.measureText(letter).width;
+      return [[...letters, [letter, w, total]], total + w];
+    },
+    [[], 0]
+  );
+
+  const width = letters[1];
+  const h = word.size;
 
   ctx.fillStyle = "#000000";
-  ctx.fillRect(p.x - w * 0.5, p.y - h * 0.55, w, h);
+  ctx.fillRect(p.x - width * 0.65, p.y - h * 0.55, width * 1.15, h);
 
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(text, p.x, p.y);
+  letters[0].forEach((letter, i) => {
+    // const lw = letter[1];
+    const x = p.x + letter[2] - width * 0.5;
+
+    // ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
+    // ctx.fillRect(x - lw / 2, p.y - h * 0.55, lw, h);
+
+    ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
+    ctx.fillText(letter[0], x, p.y);
+  });
 };
 
 export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
