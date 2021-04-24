@@ -1,4 +1,4 @@
-import { Color, GameState, Point, Segment, Word } from './types';
+import { Color, GameState, Point, Segment, Word } from "./types";
 
 const drawCircle = (
   ctx: CanvasRenderingContext2D,
@@ -7,7 +7,7 @@ const drawCircle = (
 ) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, 2 * Math.PI);
-  ctx.fillStyle = '#ff0000';
+  ctx.fillStyle = "#ff0000";
   ctx.fill();
   ctx.closePath();
 };
@@ -26,7 +26,7 @@ const drawPath = (
   });
 
   ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-  ctx.lineJoin = 'round';
+  ctx.lineJoin = "round";
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.closePath();
@@ -39,7 +39,7 @@ const drawPath = (
 
 const getMid = ([pA, pB]: [Point, Point]): Point => ({
   x: pA.x + (pB.x - pA.x) * 0.5,
-  y: pA.y + (pB.y - pA.y) * 0.5
+  y: pA.y + (pB.y - pA.y) * 0.5,
 });
 
 const drawSegments = (
@@ -56,13 +56,13 @@ const drawSegments = (
   });
 
   ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-  ctx.lineCap = 'round';
+  ctx.lineCap = "round";
   ctx.lineWidth = 10;
   ctx.stroke();
 
   ctx.closePath();
 
-  if (!word) return
+  if (!word) return;
 
   const segment = segments[word.segment];
   if (!segment) return;
@@ -70,8 +70,8 @@ const drawSegments = (
   const p = getMid(segment.points);
 
   ctx.font = `${word.size}px serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
 
   const text = word.text.toUpperCase();
   const m = ctx.measureText(text);
@@ -79,10 +79,10 @@ const drawSegments = (
   const h = word.size * 1.1;
   const w = m.width * 1.1;
 
-  ctx.fillStyle = '#000000';
+  ctx.fillStyle = "#000000";
   ctx.fillRect(p.x - w * 0.5, p.y - h * 0.55, w, h);
 
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = "#ffffff";
   ctx.fillText(text, p.x, p.y);
 };
 
@@ -94,11 +94,11 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
 
   state.tunnel.polytube.forEach(({ segments, color }) =>
     // drawPath(ctx, points, color)
-    drawSegments(ctx, segments, color);
+    drawSegments(ctx, segments, color)
   );
 
   state.tunnel.polygons.forEach(({ segments, word, color }) =>
-    drawSegments(ctx, segments, color, word);
+    drawSegments(ctx, segments, color, word)
   );
   ctx.restore();
 };

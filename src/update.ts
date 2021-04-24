@@ -1,7 +1,7 @@
-import { getPolyPoints, getPolySegments } from './geometric.utils';
-import { rndInt } from './math.utils';
-import { GameState, Point, Polygon, Size, Tunnel, Viewport } from './types';
-import words from './words';
+import { getPolyPoints, getPolySegments } from "./geometric.utils";
+import { rndInt } from "./math.utils";
+import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
+import words from "./words";
 
 const isInsideViewport = (viewport: Viewport, m: number = 1.6) => (
   poly: Polygon
@@ -18,9 +18,9 @@ const createPoly = (props: Partial<Polygon>): Polygon => ({
   rotation: 0,
   word: {
     segment: rndInt(0, 8 - 1 /* sides */),
-    text: words[2]
+    text: words[2],
   },
-  ...props
+  ...props,
 });
 
 const updatePoly = ({
@@ -29,7 +29,7 @@ const updatePoly = ({
   props,
   spacedBy,
   runSpeed,
-  shouldFilter
+  shouldFilter,
 }: {
   deltaTime: number;
   list: Array<Polygon>;
@@ -39,21 +39,21 @@ const updatePoly = ({
   shouldFilter: ReturnType<typeof isInsideViewport>;
 }): Array<Polygon> => {
   const create =
-    list.length === 0 || !list.some(poly => poly.radius < initRad * spacedBy);
+    list.length === 0 || !list.some((poly) => poly.radius < initRad * spacedBy);
 
   if (create) {
     list = [...list, createPoly(props)];
   }
 
-  return list.filter(shouldFilter).map(poly => ({
+  return list.filter(shouldFilter).map((poly) => ({
     ...poly,
     word: {
       ...poly.word,
-      size: poly.radius * 0.16
-    }
+      size: poly.radius * 0.16,
+    },
     radius: poly.radius + poly.radius * runSpeed * deltaTime,
     points: getPolyPoints(poly),
-    segments: getPolySegments(poly)
+    segments: getPolySegments(poly),
   }));
 };
 
@@ -82,7 +82,7 @@ const updTunnel = (
     // :
     {
       x: viewport.width / 2,
-      y: viewport.height / 2
+      y: viewport.height / 2,
     };
 
   return {
@@ -93,23 +93,23 @@ const updTunnel = (
       list: tunnel.polytube,
       props: {
         center,
-        color: [0, 0, 0, 0.1]
+        color: [0, 0, 0, 0.1],
       },
       spacedBy: tunnel.runSpeed * deltaTime + 1,
       runSpeed: tunnel.runSpeed,
-      shouldFilter: isInsideViewport(viewport)
+      shouldFilter: isInsideViewport(viewport),
     }),
     polygons: updatePoly({
       deltaTime,
       list: tunnel.polygons,
       props: {
         center,
-        color: [100, 100, 100, 1]
+        color: [100, 100, 100, 1],
       },
       spacedBy: tunnel.runSpeed * deltaTime + 6,
       runSpeed: tunnel.runSpeed,
-      shouldFilter: isInsideViewport(viewport)
-    })
+      shouldFilter: isInsideViewport(viewport),
+    }),
   };
 };
 
