@@ -1,13 +1,14 @@
-import { clamp } from 'lodash'
-import { getPolyPoints, getPolySegments } from './geometric.utils'
-import { GameState, Point, Polygon, Size, Tunnel, Viewport } from './types'
+import { getPolyPoints, getPolySegments } from './geometric.utils';
+import { rndInt } from './math.utils';
+import { GameState, Point, Polygon, Size, Tunnel, Viewport } from './types';
+import words from './words';
 
 const isInsideViewport = (viewport: Viewport, m: number = 1.6) => (
   poly: Polygon
 ): boolean =>
-  !(poly.radius * m > viewport.width && poly.radius * m > viewport.height)
+  !(poly.radius * m > viewport.width && poly.radius * m > viewport.height);
 
-const initRad = 1
+const initRad = 1;
 
 const createPoly = (props: Partial<Polygon>): Polygon => ({
   center: { x: 0, y: 0 },
@@ -15,37 +16,49 @@ const createPoly = (props: Partial<Polygon>): Polygon => ({
   sides: 8,
   color: [0, 0, 0, 0.3],
   rotation: 0,
+  word: {
+    segment: rndInt(0, 8 - 1 /* sides */),
+    text: words[2]
+  },
   ...props
-})
+});
 
-const sizeVel = 0.0005
-
-const updatePoly = (
-  deltaTime: number,
-  list: Array<Polygon>,
-  props: Partial<Polygon>,
-  spacedBy: number,
-  shouldFilter: ReturnType<typeof isInsideViewport>
-): Array<Polygon> => {
+const updatePoly = ({
+  deltaTime,
+  list,
+  props,
+  spacedBy,
+  runSpeed,
+  shouldFilter
+}: {
+  deltaTime: number;
+  list: Array<Polygon>;
+  props: Partial<Polygon>;
+  spacedBy: number;
+  runSpeed: number;
+  shouldFilter: ReturnType<typeof isInsideViewport>;
+}): Array<Polygon> => {
   const create =
-    list.length === 0 ||
-    !list.some(
-      (poly) => poly.radius >= initRad && poly.radius < initRad * spacedBy
-    )
+    list.length === 0 || !list.some(poly => poly.radius < initRad * spacedBy);
 
   if (create) {
-    list = [...list, createPoly(props)]
+    list = [...list, createPoly(props)];
   }
 
-  return list.filter(shouldFilter).map((poly) => ({
+  return list.filter(shouldFilter).map(poly => ({
     ...poly,
-    radius: poly.radius + (poly.radius * sizeVel) / deltaTime,
+    word: {
+      ...poly.word,
+      size: poly.radius * 0.16
+    }
+    radius: poly.radius + poly.radius * runSpeed * deltaTime,
     points: getPolyPoints(poly),
     segments: getPolySegments(poly)
-  }))
-}
+  }));
+};
 
 // const velCenter = 50
+let curr = 0;
 
 const updTunnel = (
   deltaTime: number,
@@ -70,33 +83,35 @@ const updTunnel = (
     {
       x: viewport.width / 2,
       y: viewport.height / 2
-    }
+    };
 
   return {
     ...tunnel,
     lastCenter: { x: center.x, y: center.y },
-    polytube: updatePoly(
+    polytube: updatePoly({
       deltaTime,
-      tunnel.polytube,
-      {
+      list: tunnel.polytube,
+      props: {
         center,
         color: [0, 0, 0, 0.1]
       },
-      1,
-      isInsideViewport(viewport)
-    ),
-    polygons: updatePoly(
+      spacedBy: tunnel.runSpeed * deltaTime + 1,
+      runSpeed: tunnel.runSpeed,
+      shouldFilter: isInsideViewport(viewport)
+    }),
+    polygons: updatePoly({
       deltaTime,
-      tunnel.polygons,
-      {
+      list: tunnel.polygons,
+      props: {
         center,
-        color: [0, 0, 0, 0.3]
+        color: [100, 100, 100, 1]
       },
-      3,
-      isInsideViewport(viewport)
-    )
-  }
-}
+      spacedBy: tunnel.runSpeed * deltaTime + 6,
+      runSpeed: tunnel.runSpeed,
+      shouldFilter: isInsideViewport(viewport)
+    })
+  };
+};
 
 const update = (
   deltaTime: number,
@@ -104,17 +119,9 @@ const update = (
   inputState: string,
   worldSize: Size
 ): GameState => {
-  if (inputState) console.log(inputState)
+  if (inputState) console.log(inputState);
+  state.viewport = worldSize;
+  return { ...state, tunnel: updTunnel(deltaTime, state.tunnel, state) };
+};
 
-  state.viewport = worldSize
-
-  // state.poly.radius = worldSize.height / 2 - 20
-  // state.poly.sides +=
-  //   inputState === 'arrowup' ? 1 : inputState === 'arrowdown' ? -1 : 0
-
-  // state.segments = getPolySegments(state.poly)
-
-  return { ...state, tunnel: updTunnel(deltaTime, state.tunnel, state) }
-}
-
-export default update
+export default update;
