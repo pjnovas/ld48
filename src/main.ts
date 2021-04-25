@@ -8,7 +8,7 @@ import render from "./render";
 import update from "./update";
 
 // https://musiclab.chromeexperiments.com/Song-Maker/song/5590947065233408
-const music = new Audio("assets/music.mp3");
+const music = new Audio("music/music.mp3");
 music.volume = 1;
 music.loop = true;
 

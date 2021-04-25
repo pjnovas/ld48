@@ -1,5 +1,5 @@
 {
-  "name": "ld-48",
+  "name": "ld-48-poly-typo",
   "version": "0.0.1",
   "license": "BSD-3-CLAUSE",
   "author": "Pablo Novas <pjnovas@gmail.com>",
@@ -7,7 +7,9 @@
     "build": "tsc --noEmit && parcel build index.html",
     "dev": "parcel index.html --open",
     "start": "npm run build && npm run dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "predeploy": "rm -rf .cache dist && npm run build",
+    "deploy": "gh-pages -d dist",
+    "serve": "npx serve dist"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.168",
@@ -16,12 +18,15 @@
     "eslint": "^7.24.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "gh-pages": "^3.1.0",
     "parcel-bundler": "^1.12.4",
+    "parcel-plugin-asset-copier": "^1.1.0",
     "prettier": "2.2.1",
     "typescript": "^4.2.4"
   },
   "dependencies": {
     "lodash": "^4.17.21",
     "rxjs": "^6.6.7"
-  }
+  },
+  "assetsPath": "assets/"
 }
