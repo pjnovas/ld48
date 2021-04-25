@@ -1,6 +1,6 @@
 import padStart from "lodash/padStart";
 import { clamp } from "./math.utils";
-import { Stats, Viewport } from "./types";
+import { GameState, Stats, Viewport } from "./types";
 
 const padNum = (num: number, size: number = 4): string =>
   padStart(String(num | 0), size, "0");
@@ -22,6 +22,27 @@ const drawWords = (
 
   ctx.font = `${labelSize}px Teko`;
   ctx.fillText("WORDS", width - 10, size + 10);
+};
+
+const drawWordFails = (
+  ctx: CanvasRenderingContext2D,
+  { failedWords }: Stats,
+  { width, height }: Viewport,
+  maxFails: number
+) => {
+  const size = 80;
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = "#ff0000";
+  ctx.textAlign = "right";
+
+  const wtxt = `${padNum(failedWords, 0)} / ${padNum(maxFails, 0)}`;
+
+  const y = height;
+  ctx.font = `${size}px Teko`;
+  ctx.fillText(wtxt, width - 10, y);
+
+  ctx.font = `${labelSize}px Teko`;
+  ctx.fillText("FAILS", width - 10, y - size);
 };
 
 const drawScore = (
@@ -64,8 +85,7 @@ const drawHM = (
 
 export default (
   ctx: CanvasRenderingContext2D,
-  stats: Stats,
-  viewport: Viewport
+  { stats, viewport, maxFails }: GameState
 ) => {
   ctx.save();
   ctx.textBaseline = "top";
@@ -74,5 +94,6 @@ export default (
   drawHM(ctx, stats, viewport);
   drawScore(ctx, stats, viewport);
   drawWords(ctx, stats, viewport);
+  drawWordFails(ctx, stats, viewport, maxFails);
   ctx.restore();
 };

@@ -2,6 +2,16 @@ import { BehaviorSubject } from "rxjs";
 import { GameState, Point, Segment } from "./types";
 
 const gameState$ = new BehaviorSubject<GameState>({
+  screen: "menu",
+
+  actions: {
+    menu: {
+      word: "start",
+      validIndex: 0,
+    },
+  },
+  maxFails: 3,
+
   viewport: {
     width: 500,
     height: 500,
@@ -20,6 +30,7 @@ const gameState$ = new BehaviorSubject<GameState>({
     words: 0,
     misses: 0,
     totalWords: 0,
+    failedWords: 0,
   },
 });
 

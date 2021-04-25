@@ -9,30 +9,11 @@ import {
   Word,
 } from "./types";
 
+import drawIntro from "./intro.render";
 import drawStats from "./stats.render";
 
 import { clamp, clamp01 } from "./math.utils";
-
-const getColor = (c: Color): string =>
-  `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-
-const drawPath = (
-  ctx: CanvasRenderingContext2D,
-  points: Array<Point>,
-  c: Color = [0, 0, 0, 1]
-) => {
-  ctx.beginPath();
-
-  points.forEach((p, i) => {
-    if (i === 0) ctx.moveTo(p.x, p.y);
-    ctx.lineTo(p.x, p.y);
-    if (i === points.length - 1) ctx.lineTo(points[0].x, points[0].y);
-  });
-
-  ctx.fillStyle = getColor(c);
-  ctx.fill();
-  ctx.closePath();
-};
+import { drawPath, getColor } from "./render.utils";
 
 const getMid = ([pA, pB]: [Point, Point]): Point => ({
   x: pA.x + (pB.x - pA.x) * 0.5,
@@ -111,8 +92,30 @@ const drawSegments = (
   });
 };
 
+const drawEnd = (ctx: CanvasRenderingContext2D, state: GameState) => {
+  ctx.save();
+
+  const { width, height } = state.viewport;
+
+  ctx.fillStyle = getColor([255, 0, 0, 0.5]);
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "#000000";
+  ctx.textAlign = "center";
+
+  ctx.font = `80px Teko`;
+  ctx.fillText("GAME OVER", width * 0.5, height * 0.4);
+
+  ctx.font = `50px Teko`;
+  ctx.fillText("ctrl+R or cmd+R to restart", width * 0.5, height * 0.6);
+
+  ctx.restore();
+};
+
 export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
   ctx.clearRect(0, 0, state.viewport.width, state.viewport.height);
+
+  if (state.screen === "menu") return drawIntro(ctx, state);
 
   ctx.save();
 
@@ -131,5 +134,7 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
 
   ctx.restore();
 
-  drawStats(ctx, state.stats, state.viewport);
+  if (state.screen === "end") drawEnd(ctx, state);
+
+  drawStats(ctx, state);
 };

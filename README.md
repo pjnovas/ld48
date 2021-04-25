@@ -4,10 +4,8 @@ LudumDare #48 video-game
 
 TODO
 
-- start and end game
-
-- rotation & fx
 - sfx
+- colors & rotation & fx
 - music
 - more words per segment
 - shape changes

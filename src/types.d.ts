@@ -1,3 +1,5 @@
+import { valuesIn } from "lodash";
+
 export interface FrameData {
   frameStartTime: number;
   deltaTime: number;
@@ -72,9 +74,21 @@ interface Stats {
   misses: number;
   words: number;
   totalWords: number;
+  failedWords: number;
 }
 
+type Screen = "menu" | "gameplay" | "end" | "restart";
+
 export interface GameState {
+  screen: Screen;
+  actions: {
+    [x: string]: {
+      word: string;
+      validIndex: number;
+    };
+  };
+  maxFails: number;
+
   viewport: Viewport;
   tunnel: Tunnel;
   lastTime?: number;

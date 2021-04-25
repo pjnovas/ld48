@@ -1,7 +1,15 @@
 import first from "lodash/first";
 import { getPolyPoints, getPolySegments } from "./geometric.utils";
 import { rndInt, clamp, lerp, clamp01 } from "./math.utils";
-import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
+import {
+  GameState,
+  Point,
+  Polygon,
+  Size,
+  Stats,
+  Tunnel,
+  Viewport,
+} from "./types";
 import words from "./words.json";
 
 const isInsideViewport = (viewport: Viewport, m: number = 1.6) => (
@@ -33,6 +41,7 @@ const updatePoly = ({
   runSpeed,
   gate,
   shouldFilter,
+  stats,
 }: {
   deltaTime: number;
   list: Array<Polygon>;
@@ -41,12 +50,14 @@ const updatePoly = ({
   runSpeed: number;
   gate: boolean;
   shouldFilter: ReturnType<typeof isInsideViewport>;
+  stats: Stats;
 }): Array<Polygon> => {
   const create =
     list.length === 0 || !list.some((poly) => poly.radius < initRad * spacedBy);
 
   if (create) {
     list = [...list, createPoly(props)];
+    if (gate) stats.totalWords++;
   }
 
   return list.filter(shouldFilter).map((poly) => ({
@@ -142,6 +153,7 @@ const updTunnel = (
       spacedBy: spaced + 1.05,
       runSpeed: tunnel.runSpeed,
       shouldFilter: isInsideViewport(viewport, 1.2),
+      stats,
     }),
     polygons: updatePoly({
       deltaTime,
@@ -155,9 +167,10 @@ const updTunnel = (
       runSpeed: tunnel.runSpeed,
       shouldFilter: (poly: Polygon): boolean => {
         const keep = isInsideViewport(viewport, 1.2)(poly);
-        if (!keep) stats.totalWords++;
+        if (!keep && !poly.word.done) stats.failedWords++;
         return keep;
       },
+      stats,
     }),
   };
 };
@@ -170,7 +183,25 @@ const update = (
 ): GameState => {
   state.viewport = worldSize;
 
-  if (inputState.length === 1) {
+  if (state.screen === "end") return state;
+
+  if (state.screen === "menu") {
+    const nextChar = state.actions.menu.word.charAt(
+      state.actions.menu.validIndex
+    );
+
+    if (inputState.length === 1 && inputState === nextChar) {
+      state.actions.menu.validIndex++;
+      if (state.actions.menu.validIndex >= state.actions.menu.word.length) {
+        state.actions.menu.validIndex = 0;
+        state.screen = "gameplay";
+      }
+    }
+
+    return state;
+  }
+
+  if (state.screen === "gameplay" && inputState.length === 1) {
     const poly = state.tunnel.polygons.find(({ word }) => !word.done);
     if (!poly) return;
     const word = poly.word;
@@ -187,6 +218,11 @@ const update = (
     } else {
       state.stats.misses++;
     }
+  }
+
+  if (state.stats.failedWords >= state.maxFails) {
+    state.screen = "end";
+    return state;
   }
 
   return { ...state, tunnel: updTunnel(deltaTime, state.tunnel, state) };
