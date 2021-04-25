@@ -7,6 +7,19 @@ import inputState$, { clearInput } from "./inputStates.stream";
 import render from "./render";
 import update from "./update";
 
+// https://musiclab.chromeexperiments.com/Song-Maker/song/5590947065233408
+const music = new Audio("assets/music.mp3");
+music.volume = 1;
+music.loop = true;
+
+document.addEventListener(
+  "keypress",
+  () => {
+    music.play();
+  },
+  { once: true }
+);
+
 window.onload = () => {
   const gameArea = document.getElementById("game") as HTMLCanvasElement;
 
