@@ -7,7 +7,7 @@ const gameState$ = new BehaviorSubject<GameState>({
     height: 500,
   },
   tunnel: {
-    runSpeed: 0.8,
+    runSpeed: 0,
     polygons: [],
     polytube: [],
 

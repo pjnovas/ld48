@@ -124,6 +124,10 @@ const updTunnel = (
 ): Tunnel => {
   const currentCenter = getCenter(deltaTime, tunnel, viewport);
 
+  const spaced = tunnel.runSpeed * deltaTime;
+  const gateSpace = clamp(10 - Math.floor(stats.totalWords / 10), 6, 10);
+  tunnel.runSpeed = stats.totalWords / 100 + 0.8;
+
   return {
     ...tunnel,
     currentCenter,
@@ -135,7 +139,7 @@ const updTunnel = (
         color: [0, 0, 0, 0.1],
       },
       gate: false,
-      spacedBy: tunnel.runSpeed * deltaTime + 1.05,
+      spacedBy: spaced + 1.05,
       runSpeed: tunnel.runSpeed,
       shouldFilter: isInsideViewport(viewport, 1.2),
     }),
@@ -147,7 +151,7 @@ const updTunnel = (
         color: [255, 0, 0, 1],
       },
       gate: true,
-      spacedBy: tunnel.runSpeed * deltaTime + 4,
+      spacedBy: spaced + gateSpace,
       runSpeed: tunnel.runSpeed,
       shouldFilter: (poly: Polygon): boolean => {
         const keep = isInsideViewport(viewport, 1.2)(poly);

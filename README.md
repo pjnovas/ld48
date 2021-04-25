@@ -5,7 +5,6 @@ LudumDare #48 video-game
 TODO
 
 - start and end game
-- game getting harder
 
 - rotation & fx
 - sfx
