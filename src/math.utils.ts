@@ -1,4 +1,4 @@
-import { Color } from './types';
+import { Color } from "./types";
 
 export const lerp = (start: number, end: number, time: number) =>
   start * (1 - time) + end * time;

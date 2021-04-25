@@ -8,9 +8,9 @@ const gameState$ = new BehaviorSubject<GameState>({
   },
   tunnel: {
     runSpeed: 0.8,
-    // lastCenter: { x: 0, y: 0 },
     polygons: [],
     polytube: [],
+    // TODO: every X seconds move the tail
   },
 });
 

@@ -1,6 +1,6 @@
 import first from "lodash/first";
 import { getPolyPoints, getPolySegments } from "./geometric.utils";
-import { rndInt } from "./math.utils";
+import { rndInt, clamp } from "./math.utils";
 import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
 import words from "./words.json";
 
@@ -31,6 +31,7 @@ const updatePoly = ({
   props,
   spacedBy,
   runSpeed,
+  gate,
   shouldFilter,
 }: {
   deltaTime: number;
@@ -38,6 +39,7 @@ const updatePoly = ({
   props: Partial<Polygon>;
   spacedBy: number;
   runSpeed: number;
+  gate: boolean;
   shouldFilter: ReturnType<typeof isInsideViewport>;
 }): Array<Polygon> => {
   const create =
@@ -49,12 +51,12 @@ const updatePoly = ({
 
   return list.filter(shouldFilter).map((poly) => ({
     ...poly,
-    word: {
+    word: gate && {
       ...poly.word,
       size: poly.radius * 0.16,
     },
     radius: poly.radius + poly.radius * runSpeed * deltaTime,
-    points: getPolyPoints(poly),
+    points: gate && getPolyPoints(poly),
     segments: getPolySegments(poly),
   }));
 };
@@ -66,26 +68,24 @@ const updTunnel = (
   tunnel: Tunnel,
   { viewport }: GameState
 ): Tunnel => {
-  // const velCenter = 50
-  const center: Point =
-    //  tunnel.lastCenter
-    // ? {
-    //     x: clamp(
-    //       tunnel.lastCenter.x + deltaTime * velCenter,
-    //       0,
-    //       viewport.width
-    //     ),
-    //     y: clamp(
-    //       tunnel.lastCenter.y + deltaTime * velCenter,
-    //       0,
-    //       viewport.height
-    //     )
-    //   }
-    // :
-    {
-      x: viewport.width / 2,
-      y: viewport.height / 2,
-    };
+  const velCenter = 50;
+  const center: Point = tunnel.lastCenter
+    ? {
+        x: clamp(
+          tunnel.lastCenter.x + deltaTime * velCenter,
+          0,
+          viewport.width * 0.5
+        ),
+        y: clamp(
+          tunnel.lastCenter.y + deltaTime * velCenter,
+          0,
+          viewport.height * 0.5
+        ),
+      }
+    : {
+        x: viewport.width / 2,
+        y: viewport.height / 2,
+      };
 
   return {
     ...tunnel,
@@ -97,6 +97,7 @@ const updTunnel = (
         center,
         color: [0, 0, 0, 0.1],
       },
+      gate: false,
       spacedBy: tunnel.runSpeed * deltaTime + 1,
       runSpeed: tunnel.runSpeed,
       shouldFilter: isInsideViewport(viewport),
@@ -106,8 +107,9 @@ const updTunnel = (
       list: tunnel.polygons,
       props: {
         center,
-        color: [100, 100, 100, 1],
+        color: [255, 0, 0, 1],
       },
+      gate: true,
       spacedBy: tunnel.runSpeed * deltaTime + 6,
       runSpeed: tunnel.runSpeed,
       shouldFilter: isInsideViewport(viewport),

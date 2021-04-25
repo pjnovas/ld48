@@ -1,4 +1,5 @@
-import { Color, GameState, Point, Segment, Word } from "./types";
+import { Color, GameState, Point, Polygon, Segment, Word } from "./types";
+import { clamp01 } from "./math.utils";
 
 const getColor = (c: Color): string =>
   `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
@@ -50,9 +51,8 @@ const getMid = ([pA, pB]: [Point, Point]): Point => ({
 
 const drawSegments = (
   ctx: CanvasRenderingContext2D,
-  segments: Array<Segment>,
-  c: Color,
-  word?: Word
+  { segments, points, color, word, radius }: Polygon,
+  height: number
 ) => {
   ctx.beginPath();
 
@@ -61,12 +61,21 @@ const drawSegments = (
     ctx.lineTo(points[1].x, points[1].y);
   });
 
-  ctx.strokeStyle = getColor(c);
+  ctx.strokeStyle = getColor(color);
   ctx.lineCap = "round";
   ctx.lineWidth = 10;
   ctx.stroke();
 
   ctx.closePath();
+
+  if (points) {
+    drawPath(ctx, points, [
+      color[0],
+      color[1],
+      color[2],
+      clamp01((radius / height) * 0.8),
+    ]);
+  }
 
   if (!word) return;
 
@@ -103,10 +112,13 @@ const drawSegments = (
     // ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
     // ctx.fillRect(x - lw / 2, p.y - h * 0.55, lw, h);
 
-    ctx.fillStyle =
-      i >= word.matchAt
-        ? getColor([255, 255, 255, 1])
-        : getColor([0, 255, 0, 1]);
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#000000";
+
+    ctx.fillStyle = i >= word.matchAt ? "#ffffff" : getColor([0, 255, 0, 1]);
+
+    ctx.strokeText(letter[0], x, p.y);
     ctx.fillText(letter[0], x, p.y);
   });
 };
@@ -117,15 +129,14 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
 
   ctx.save();
 
-  state.tunnel.polytube.forEach(({ segments, color }) =>
-    drawSegments(ctx, segments, color)
-  );
+  state.tunnel.polytube.forEach((poly) => drawSegments(ctx, poly));
 
   state.tunnel.polygons
     .filter(({ word }) => !word.done)
-    .forEach(({ points, segments, word, color }) => {
-      drawPath(ctx, points, [255, 0, 0, 0.1]);
-      drawSegments(ctx, segments, [255, 0, 0, 1], word);
+    .slice()
+    .reverse()
+    .forEach((poly) => {
+      drawSegments(ctx, poly, height);
     });
 
   ctx.restore();
