@@ -14,6 +14,13 @@ const gameState$ = new BehaviorSubject<GameState>({
     currentTime: 0,
     currentWormIndex: 0,
   },
+  stats: {
+    score: 0,
+    hits: 0,
+    words: 0,
+    misses: 0,
+    totalWords: 0,
+  },
 });
 
 export default gameState$;

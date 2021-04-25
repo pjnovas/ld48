@@ -27,7 +27,6 @@ interface Word {
   points?: number;
   matchAt?: number;
   done?: boolean;
-  score?: number;
 }
 
 interface Polygon {
@@ -67,8 +66,18 @@ interface Tunnel {
   };
 }
 
+interface Stats {
+  score: number;
+  hits: number;
+  misses: number;
+  words: number;
+  totalWords: number;
+}
+
 export interface GameState {
   viewport: Viewport;
   tunnel: Tunnel;
   lastTime?: number;
+
+  stats: Stats;
 }

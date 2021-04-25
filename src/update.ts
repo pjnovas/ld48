@@ -120,7 +120,7 @@ const getCenter = (
 const updTunnel = (
   deltaTime: number,
   tunnel: Tunnel,
-  { viewport }: GameState
+  { viewport, stats }: GameState
 ): Tunnel => {
   const currentCenter = getCenter(deltaTime, tunnel, viewport);
 
@@ -137,7 +137,7 @@ const updTunnel = (
       gate: false,
       spacedBy: tunnel.runSpeed * deltaTime + 1,
       runSpeed: tunnel.runSpeed,
-      shouldFilter: isInsideViewport(viewport),
+      shouldFilter: isInsideViewport(viewport, 1.2),
     }),
     polygons: updatePoly({
       deltaTime,
@@ -147,9 +147,13 @@ const updTunnel = (
         color: [255, 0, 0, 1],
       },
       gate: true,
-      spacedBy: tunnel.runSpeed * deltaTime + 6,
+      spacedBy: tunnel.runSpeed * deltaTime + 4,
       runSpeed: tunnel.runSpeed,
-      shouldFilter: isInsideViewport(viewport),
+      shouldFilter: (poly: Polygon): boolean => {
+        const keep = isInsideViewport(viewport, 1.2)(poly);
+        if (!keep) stats.totalWords++;
+        return keep;
+      },
     }),
   };
 };
@@ -170,11 +174,14 @@ const update = (
     if (inputState === word.text.charAt(word.matchAt)) {
       if (word.matchAt === word.text.length - 1) {
         word.done = true;
-        console.log("done!");
-        // TODO: sum up word.score
-      } else word.matchAt++;
+        state.stats.score += word.text.length;
+        state.stats.words++;
+      } else {
+        word.matchAt++;
+        state.stats.hits++;
+      }
     } else {
-      console.log("MISS!");
+      state.stats.misses++;
     }
   }
 

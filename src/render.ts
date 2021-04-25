@@ -1,20 +1,20 @@
-import { Color, GameState, Point, Polygon, Segment, Word } from "./types";
-import { clamp01 } from "./math.utils";
+import {
+  Color,
+  GameState,
+  Point,
+  Polygon,
+  Segment,
+  Stats,
+  Viewport,
+  Word,
+} from "./types";
+
+import drawStats from "./stats.render";
+
+import { clamp, clamp01 } from "./math.utils";
 
 const getColor = (c: Color): string =>
   `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-
-const drawCircle = (
-  ctx: CanvasRenderingContext2D,
-  { x, y }: Point,
-  radius: number
-) => {
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI);
-  ctx.fillStyle = "#ff0000";
-  ctx.fill();
-  ctx.closePath();
-};
 
 const drawPath = (
   ctx: CanvasRenderingContext2D,
@@ -29,19 +29,9 @@ const drawPath = (
     if (i === points.length - 1) ctx.lineTo(points[0].x, points[0].y);
   });
 
-  // ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-  // ctx.lineJoin = "round";
-  // ctx.lineWidth = 3;
-  // ctx.stroke();
-
   ctx.fillStyle = getColor(c);
   ctx.fill();
   ctx.closePath();
-
-  // drawCircle(ctx, points[0], 3)
-  // points.forEach((p, i) => {
-  //   drawCircle(ctx, p, 3)
-  // })
 };
 
 const getMid = ([pA, pB]: [Point, Point]): Point => ({
@@ -52,7 +42,7 @@ const getMid = ([pA, pB]: [Point, Point]): Point => ({
 const drawSegments = (
   ctx: CanvasRenderingContext2D,
   { segments, points, color, word, radius }: Polygon,
-  height?: number
+  { width, height }: Viewport
 ) => {
   ctx.beginPath();
 
@@ -99,18 +89,10 @@ const drawSegments = (
     [[], 0]
   );
 
-  const width = letters[1];
-  const h = word.size;
-
-  // ctx.fillStyle = getColor([255, 0, 0, 0.8]);
-  // ctx.fillRect(p.x - width * 0.65, p.y - h * 0.55, width * 1.15, h);
+  const w = letters[1];
 
   letters[0].forEach((letter, i) => {
-    // const lw = letter[1];
-    const x = p.x + letter[2] - width * 0.5;
-
-    // ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
-    // ctx.fillRect(x - lw / 2, p.y - h * 0.55, lw, h);
+    const x = p.x + letter[2] - w * 0.5;
 
     ctx.lineJoin = "round";
     ctx.lineWidth = 3;
@@ -124,20 +106,23 @@ const drawSegments = (
 };
 
 export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
-  const { width, height } = state.viewport;
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, state.viewport.width, state.viewport.height);
 
   ctx.save();
 
-  state.tunnel.polytube.forEach((poly) => drawSegments(ctx, poly));
+  state.tunnel.polytube.forEach((poly) =>
+    drawSegments(ctx, poly, state.viewport)
+  );
 
   state.tunnel.polygons
     .filter(({ word }) => !word.done)
     .slice()
     .reverse()
     .forEach((poly) => {
-      drawSegments(ctx, poly, height);
+      drawSegments(ctx, poly, state.viewport);
     });
 
   ctx.restore();
+
+  drawStats(ctx, state.stats, state.viewport);
 };
