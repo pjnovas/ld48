@@ -10,7 +10,9 @@ const gameState$ = new BehaviorSubject<GameState>({
     runSpeed: 0.8,
     polygons: [],
     polytube: [],
-    // TODO: every X seconds move the tail
+
+    currentTime: 0,
+    currentWormIndex: 0,
   },
 });
 

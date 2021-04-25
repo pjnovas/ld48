@@ -1,6 +1,6 @@
 import first from "lodash/first";
 import { getPolyPoints, getPolySegments } from "./geometric.utils";
-import { rndInt, clamp } from "./math.utils";
+import { rndInt, clamp, lerp, clamp01 } from "./math.utils";
 import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
 import words from "./words.json";
 
@@ -61,40 +61,77 @@ const updatePoly = ({
   }));
 };
 
-let curr = 0;
+const wormPoints = (viewport: Viewport) => [
+  {
+    x: viewport.width * 0.5,
+    y: viewport.height * 0.75,
+  },
+  {
+    x: viewport.width * 0.25,
+    y: viewport.height * 0.5,
+  },
+  {
+    x: viewport.width * 0.75,
+    y: viewport.height * 0.25,
+  },
+  {
+    x: viewport.width * 0.3,
+    y: viewport.height * 0.5,
+  },
+];
+
+const getCenter = (
+  deltaTime: number,
+  tunnel: Tunnel,
+  viewport: Viewport
+): Point => {
+  if (!tunnel.currentCenter) {
+    tunnel.currentTarget = {
+      time: 1000,
+      target: wormPoints(viewport)[0],
+    };
+
+    return {
+      x: viewport.width * 0.5,
+      y: viewport.height * 0.5,
+    };
+  }
+
+  const t = clamp01(tunnel.currentTime / tunnel.currentTarget.time);
+
+  const center: Point = {
+    x: lerp(tunnel.currentCenter.x, tunnel.currentTarget.target.x, t),
+    y: lerp(tunnel.currentCenter.y, tunnel.currentTarget.target.y, t),
+  };
+
+  tunnel.currentTime += deltaTime;
+
+  if (t * 100 > 1) {
+    tunnel.currentTime = 0;
+    tunnel.currentWormIndex++;
+    const worm = wormPoints(viewport);
+    if (tunnel.currentWormIndex > worm.length - 1) tunnel.currentWormIndex = 0;
+    tunnel.currentTarget.target = worm[tunnel.currentWormIndex];
+  }
+
+  return { x: center.x, y: center.y };
+};
 
 const updTunnel = (
   deltaTime: number,
   tunnel: Tunnel,
   { viewport }: GameState
 ): Tunnel => {
-  const velCenter = 50;
-  const center: Point = tunnel.lastCenter
-    ? {
-        x: clamp(
-          tunnel.lastCenter.x + deltaTime * velCenter,
-          0,
-          viewport.width * 0.5
-        ),
-        y: clamp(
-          tunnel.lastCenter.y + deltaTime * velCenter,
-          0,
-          viewport.height * 0.5
-        ),
-      }
-    : {
-        x: viewport.width / 2,
-        y: viewport.height / 2,
-      };
+  const currentCenter = getCenter(deltaTime, tunnel, viewport);
 
   return {
     ...tunnel,
-    lastCenter: { x: center.x, y: center.y },
+    currentCenter,
     polytube: updatePoly({
       deltaTime,
       list: tunnel.polytube,
       props: {
-        center,
+        center: currentCenter,
         color: [0, 0, 0, 0.1],
       },
       gate: false,
@@ -106,7 +143,7 @@ const updTunnel = (
       deltaTime,
       list: tunnel.polygons,
       props: {
-        center,
+        center: currentCenter,
         color: [255, 0, 0, 1],
       },
       gate: true,

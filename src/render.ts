@@ -52,7 +52,7 @@ const getMid = ([pA, pB]: [Point, Point]): Point => ({
 const drawSegments = (
   ctx: CanvasRenderingContext2D,
   { segments, points, color, word, radius }: Polygon,
-  height: number
+  height?: number
 ) => {
   ctx.beginPath();
 
@@ -73,7 +73,7 @@ const drawSegments = (
       color[0],
       color[1],
       color[2],
-      clamp01((radius / height) * 0.8),
+      clamp01((radius / height) * 0.5),
     ]);
   }
 

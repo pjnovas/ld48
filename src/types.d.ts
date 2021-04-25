@@ -46,13 +46,25 @@ interface Segment {
   color?: Color;
 }
 
+interface PatternDir {
+  time: number;
+  target: Point;
+}
+
 interface Tunnel {
   runSpeed: number;
   polygons: Array<Polygon>;
   polytube: Array<Polygon>;
 
-  // timed
-  lastCenter?: Point;
+  currentCenter?: Point;
+  currentTarget?: PatternDir;
+  currentWormIndex?: number;
+  currentTime?: number;
+
+  patterns?: {
+    lastMove: number;
+    dirPattern?: Array<PatternDir>;
+  };
 }
 
 export interface GameState {
