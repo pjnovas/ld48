@@ -10,6 +10,7 @@ import {
   Tunnel,
   Viewport,
 } from "./types";
+import { play } from "./audio";
 import words from "./words.json";
 
 const isInsideViewport = (viewport: Viewport, m: number = 1.6) => (
@@ -191,6 +192,8 @@ const update = (
     );
 
     if (inputState.length === 1 && inputState === nextChar) {
+      play();
+
       state.actions.menu.validIndex++;
       if (state.actions.menu.validIndex >= state.actions.menu.word.length) {
         state.actions.menu.validIndex = 0;

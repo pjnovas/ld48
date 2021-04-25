@@ -95,3 +95,9 @@ export interface GameState {
 
   stats: Stats;
 }
+
+declare global {
+  interface Window {
+    jsfx: any;
+  }
+}
