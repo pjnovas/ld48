@@ -1,11 +1,8 @@
 import jsfx from "./jsfx";
 import library from "./library.audio.json";
 
-export const initialize = () => {
-  // jsfx.Sounds(library);
-};
+const sfx = jsfx.Sounds(library);
 
-export const play = () => {
-  const sfx = jsfx.Sounds(library);
-  sfx.select();
+export const play = (name: string) => {
+  sfx[name] && sfx[name]();
 };

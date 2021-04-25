@@ -1,4 +1,62 @@
 {
-  "select": { "Volume": { "Sustain": 0.1, "Decay": 0.15, "Punch": 0.55 } },
-  "long": { "Volume": { "Sustain": 0.1, "Decay": 0.5, "Punch": 1 } }
+  "type": {
+    "Frequency": {
+      "Start": 927.965406480364,
+      "Min": 110,
+      "Slide": -0.8649931013686427
+    },
+    "Generator": {
+      "Func": "sine",
+      "A": 0.3430539732432203,
+      "ASlide": 0.15646200484118214
+    },
+    "Filter": { "HP": 0.17868562346226122 },
+    "Volume": { "Sustain": 0.16960199465634218, "Decay": 0.37953006694163566 }
+  },
+  "miss": {
+    "Frequency": {
+      "Start": 988,
+      "Slide": 0.05,
+      "ChangeSpeed": 0.5,
+      "ChangeAmount": 1,
+      "Max": 1780,
+      "Min": 1047,
+      "DeltaSlide": -0.01,
+      "RepeatSpeed": 0
+    },
+    "Generator": { "Func": "noise", "ASlide": 0 },
+    "Volume": {
+      "Sustain": 0,
+      "Decay": 0.091,
+      "Punch": 2.53,
+      "Master": 0.44,
+      "Attack": 0.001
+    },
+    "Vibrato": { "Depth": 0, "Frequency": 0.01, "FrequencySlide": 0.02 },
+    "Phaser": { "Offset": 0.64 }
+  },
+  "word": {
+    "Frequency": {
+      "Start": 852.0465593397951,
+      "ChangeSpeed": 0.10200836334081734,
+      "ChangeAmount": 5.238337985232416
+    },
+    "Volume": { "Sustain": 0.09, "Decay": 0.241, "Punch": 0.22 },
+    "Generator": { "Func": "sine" }
+  },
+  "fail": {
+    "Frequency": { "Start": 452.0540722536366, "Slide": 0.136429497668748 },
+    "Vibrato": { "Depth": 0.6020190160314423, "Frequency": 36.95050009343216 },
+    "Generator": { "Func": "saw" },
+    "Volume": { "Sustain": 0.21586965208668324, "Decay": 0.3086376149827895 }
+  },
+  "loose": {
+    "Frequency": { "Start": 519.0950485445417, "Slide": -0.374545051312524 },
+    "Generator": {
+      "Func": "square",
+      "A": 0.23335722529020209,
+      "ASlide": -0.06100368141007162
+    },
+    "Volume": { "Sustain": 0.81, "Decay": 0.10728185316726457 }
+  }
 }

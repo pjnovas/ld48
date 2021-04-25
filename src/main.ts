@@ -4,12 +4,10 @@ import frames$ from "./frames.stream";
 import gameState$ from "./gameState.stream";
 import viewportState$ from "./viewport.stream";
 import inputState$, { clearInput } from "./inputStates.stream";
-import { initialize } from "./audio";
 import render from "./render";
 import update from "./update";
 
 window.onload = () => {
-  // initialize();
   const gameArea = document.getElementById("game") as HTMLCanvasElement;
 
   viewportState$.subscribe((size) => {

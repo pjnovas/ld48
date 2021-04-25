@@ -168,7 +168,10 @@ const updTunnel = (
       runSpeed: tunnel.runSpeed,
       shouldFilter: (poly: Polygon): boolean => {
         const keep = isInsideViewport(viewport, 1.2)(poly);
-        if (!keep && !poly.word.done) stats.failedWords++;
+        if (!keep && !poly.word.done) {
+          stats.failedWords++;
+          play("fail");
+        }
         return keep;
       },
       stats,
@@ -191,13 +194,18 @@ const update = (
       state.actions.menu.validIndex
     );
 
-    if (inputState.length === 1 && inputState === nextChar) {
-      play();
+    if (inputState.length === 1) {
+      if (inputState === nextChar) {
+        play("type");
 
-      state.actions.menu.validIndex++;
-      if (state.actions.menu.validIndex >= state.actions.menu.word.length) {
-        state.actions.menu.validIndex = 0;
-        state.screen = "gameplay";
+        state.actions.menu.validIndex++;
+        if (state.actions.menu.validIndex >= state.actions.menu.word.length) {
+          state.actions.menu.validIndex = 0;
+          state.screen = "gameplay";
+          play("word");
+        }
+      } else {
+        play("miss");
       }
     }
 
@@ -210,21 +218,26 @@ const update = (
     const word = poly.word;
 
     if (inputState === word.text.charAt(word.matchAt)) {
+      play("type");
+
       if (word.matchAt === word.text.length - 1) {
         word.done = true;
         state.stats.score += word.text.length;
         state.stats.words++;
+        play("word");
       } else {
         word.matchAt++;
         state.stats.hits++;
       }
     } else {
+      play("miss");
       state.stats.misses++;
     }
   }
 
   if (state.stats.failedWords >= state.maxFails) {
     state.screen = "end";
+    play("loose");
     return state;
   }
 
