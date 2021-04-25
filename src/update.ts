@@ -2,7 +2,7 @@ import first from "lodash/first";
 import { getPolyPoints, getPolySegments } from "./geometric.utils";
 import { rndInt } from "./math.utils";
 import { GameState, Point, Polygon, Size, Tunnel, Viewport } from "./types";
-import words from "./words";
+import words from "./words.json";
 
 const isInsideViewport = (viewport: Viewport, m: number = 1.6) => (
   poly: Polygon

@@ -1,4 +1,3 @@
-import { words } from "lodash";
 import { Color, GameState, Point, Segment, Word } from "./types";
 
 const getColor = (c: Color): string =>

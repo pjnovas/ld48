@@ -3,6 +3,7 @@
     "lib": ["ES2017", "DOM"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "baseUrl": "./src",
     "paths": {
       "~/*": ["./*"]
