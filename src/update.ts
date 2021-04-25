@@ -135,7 +135,7 @@ const updTunnel = (
         color: [0, 0, 0, 0.1],
       },
       gate: false,
-      spacedBy: tunnel.runSpeed * deltaTime + 1,
+      spacedBy: tunnel.runSpeed * deltaTime + 1.05,
       runSpeed: tunnel.runSpeed,
       shouldFilter: isInsideViewport(viewport, 1.2),
     }),

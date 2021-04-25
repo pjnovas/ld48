@@ -42,7 +42,8 @@ const getMid = ([pA, pB]: [Point, Point]): Point => ({
 const drawSegments = (
   ctx: CanvasRenderingContext2D,
   { segments, points, color, word, radius }: Polygon,
-  { width, height }: Viewport
+  { width, height }: Viewport,
+  isCurrent?: boolean
 ) => {
   ctx.beginPath();
 
@@ -63,18 +64,23 @@ const drawSegments = (
       color[0],
       color[1],
       color[2],
-      clamp01((radius / height) * 0.5),
+      clamp01((radius / height) * 0.2),
     ]);
   }
 
-  if (!word) return;
+  if (!word || !isCurrent) return;
 
   const segment = segments[word.segment];
   if (!segment) return;
 
-  const p = getMid(segment.points);
+  const pm = getMid(segment.points);
+  const pad = 100;
+  const p = {
+    x: clamp(pm.x, pad, width - pad),
+    y: clamp(pm.y, pad, height - pad),
+  };
 
-  ctx.font = `${word.size}px Teko`;
+  ctx.font = `${clamp(word.size, 0, 50)}px Teko`;
   ctx.textBaseline = "middle";
 
   type Letter = [letter: string, width: number, offset: number];
@@ -89,10 +95,10 @@ const drawSegments = (
     [[], 0]
   );
 
-  const w = letters[1];
+  const totalWidth = letters[1];
 
   letters[0].forEach((letter, i) => {
-    const x = p.x + letter[2] - w * 0.5;
+    const x = p.x + letter[2] - totalWidth * 0.5;
 
     ctx.lineJoin = "round";
     ctx.lineWidth = 3;
@@ -114,13 +120,14 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
     drawSegments(ctx, poly, state.viewport)
   );
 
-  state.tunnel.polygons
+  const parsed = state.tunnel.polygons
     .filter(({ word }) => !word.done)
     .slice()
-    .reverse()
-    .forEach((poly) => {
-      drawSegments(ctx, poly, state.viewport);
-    });
+    .reverse();
+
+  parsed.forEach((poly, i) => {
+    drawSegments(ctx, poly, state.viewport, i === parsed.length - 1);
+  });
 
   ctx.restore();
 
