@@ -1,6 +1,9 @@
 import { words } from "lodash";
 import { Color, GameState, Point, Segment, Word } from "./types";
 
+const getColor = (c: Color): string =>
+  `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
+
 const drawCircle = (
   ctx: CanvasRenderingContext2D,
   { x, y }: Point,
@@ -26,10 +29,13 @@ const drawPath = (
     if (i === points.length - 1) ctx.lineTo(points[0].x, points[0].y);
   });
 
-  ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
-  ctx.lineJoin = "round";
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  // ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
+  // ctx.lineJoin = "round";
+  // ctx.lineWidth = 3;
+  // ctx.stroke();
+
+  ctx.fillStyle = getColor(c);
+  ctx.fill();
   ctx.closePath();
 
   // drawCircle(ctx, points[0], 3)
@@ -56,7 +62,7 @@ const drawSegments = (
     ctx.lineTo(points[1].x, points[1].y);
   });
 
-  ctx.strokeStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
+  ctx.strokeStyle = getColor(c);
   ctx.lineCap = "round";
   ctx.lineWidth = 10;
   ctx.stroke();
@@ -70,8 +76,7 @@ const drawSegments = (
 
   const p = getMid(segment.points);
 
-  ctx.font = `${word.size}px serif`;
-  ctx.textAlign = "center";
+  ctx.font = `${word.size}px Teko`;
   ctx.textBaseline = "middle";
 
   type Letter = [letter: string, width: number, offset: number];
@@ -89,8 +94,8 @@ const drawSegments = (
   const width = letters[1];
   const h = word.size;
 
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(p.x - width * 0.65, p.y - h * 0.55, width * 1.15, h);
+  // ctx.fillStyle = getColor([255, 0, 0, 0.8]);
+  // ctx.fillRect(p.x - width * 0.65, p.y - h * 0.55, width * 1.15, h);
 
   letters[0].forEach((letter, i) => {
     // const lw = letter[1];
@@ -99,7 +104,10 @@ const drawSegments = (
     // ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
     // ctx.fillRect(x - lw / 2, p.y - h * 0.55, lw, h);
 
-    ctx.fillStyle = i >= word.matchAt ? "#ff0000" : "#00ff00";
+    ctx.fillStyle =
+      i >= word.matchAt
+        ? getColor([255, 255, 255, 1])
+        : getColor([0, 255, 0, 1]);
     ctx.fillText(letter[0], x, p.y);
   });
 };
@@ -116,9 +124,10 @@ export default (ctx: CanvasRenderingContext2D) => (state: GameState) => {
 
   state.tunnel.polygons
     .filter(({ word }) => !word.done)
-    .forEach(({ segments, word, color }) =>
-      drawSegments(ctx, segments, color, word)
-    );
+    .forEach(({ points, segments, word, color }) => {
+      drawPath(ctx, points, [255, 0, 0, 0.1]);
+      drawSegments(ctx, segments, [255, 0, 0, 1], word);
+    });
 
   ctx.restore();
 };
