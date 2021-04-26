@@ -1,10 +1,10 @@
 {
-  "name": "ld-48-poly-typo",
+  "name": "ld-48",
   "version": "0.0.1",
   "license": "BSD-3-CLAUSE",
   "author": "Pablo Novas <pjnovas@gmail.com>",
   "scripts": {
-    "build": "tsc --noEmit && parcel build index.html",
+    "build": "tsc --noEmit && parcel build index.html --public-url /ld48",
     "dev": "parcel index.html --open",
     "start": "npm run build && npm run dev",
     "predeploy": "rm -rf .cache dist && npm run build",
